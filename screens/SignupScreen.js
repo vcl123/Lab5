@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import { Text, StyleSheet } from "react-native";
+import { Text, StyleSheet, Alert } from "react-native";
 import { Formik } from "formik";
-import {auth} from '../firebaseConfig'
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebaseConfig';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { View, TextInput, Logo, Button, FormErrorMessage } from "../components";
 import { Images, Colors } from "../config";
 import { useTogglePasswordVisibility } from "../hooks";
 import { signupValidationSchema } from "../utils";
-export const SignupScreen =  ({ navigation })  => {
+
+export const SignupScreen = ({ navigation }) => {
   const [errorState, setErrorState] = useState("");
   const {
     passwordVisibility,
@@ -18,23 +19,33 @@ export const SignupScreen =  ({ navigation })  => {
     confirmPasswordIcon,
     confirmPasswordVisibility,
   } = useTogglePasswordVisibility();
+
   const handleSignup = async (values) => {
     const { email, password } = values;
-    // auth()
-    //   .
-      createUserWithEmailAndPassword(auth,email, password)
-      .then(
-        ()=>navigation.navigate('Login')
-        )        
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        // Hiển thị thông báo khi tạo tài khoản thành công
+        Alert.alert(
+          "Thông báo",
+          "Bạn đã tạo tài khoản thành công!",
+          [
+            {
+              text: "OK",
+              onPress: () => navigation.navigate('Login'), // Điều hướng đến màn hình Login
+            }
+          ]
+        );
+      })
       .catch((error) => setErrorState(error.message));
   };
+
   return (
     <View isSafe style={styles.container}>
       <KeyboardAwareScrollView enableOnAndroid={true}>
         {/* LogoContainer: consits app logo and screen title */}
         <View style={styles.logoContainer}>
           <Logo uri={Images.logo} />
-          <Text style={styles.screenTitle}>Create a new account!</Text>
+          <Text style={styles.screenTitle}>Tạo tài khoản</Text>
         </View>
         {/* Formik Wrapper */}
         <Formik
@@ -83,10 +94,7 @@ export const SignupScreen =  ({ navigation })  => {
                 onChangeText={handleChange("password")}
                 onBlur={handleBlur("password")}
               />
-              <FormErrorMessage
-                error={errors.password}
-                visible={touched.password}
-              />
+              <FormErrorMessage error={errors.password} visible={touched.password} />
               <TextInput
                 name="confirmPassword"
                 leftIconName="key-variant"
@@ -111,7 +119,7 @@ export const SignupScreen =  ({ navigation })  => {
               ) : null}
               {/* Signup button */}
               <Button style={styles.button} onPress={handleSubmit}>
-                <Text style={styles.buttonText}>Signup</Text>
+                <Text style={styles.buttonText}>Đăng ký</Text>
               </Button>
             </>
           )}
@@ -120,13 +128,14 @@ export const SignupScreen =  ({ navigation })  => {
         <Button
           style={styles.borderlessButtonContainer}
           borderless
-          title={"Already have an account?"}
+          title={"Bạn đã có tài khoản?"}
           onPress={() => navigation.navigate('Login')}
         />
       </KeyboardAwareScrollView>
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

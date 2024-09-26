@@ -14,7 +14,7 @@ export const HomeScreen = ({navigation}) => {
   };
   return (
     <View style={styles.container}>
-      <Button title="Sign Out" onPress={handleLogout} />
+      <Button title="Quay lại đăng nhập" onPress={handleLogout} />
     </View>
   );
 };

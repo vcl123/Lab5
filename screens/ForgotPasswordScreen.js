@@ -1,28 +1,41 @@
 import React, { useState } from "react";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, Alert } from "react-native";
 import { Formik } from "formik";
-//import auth from "@react-native-firebase/auth";
-import {auth} from '../firebaseConfig'
+import { auth } from '../firebaseConfig';
 import { passwordResetSchema } from "../utils";
 import { Colors } from "../config";
 import { View, TextInput, Button, FormErrorMessage } from "../components";
 import { sendPasswordResetEmail } from "firebase/auth";
+
 export const ForgotPasswordScreen = ({navigation}) => {
   const [errorState, setErrorState] = useState("");
+
   const handleSendPasswordResetEmail = (values) => {
     const { email } = values;
-    // auth()
-    //   .
-      sendPasswordResetEmail(auth,email)
+    sendPasswordResetEmail(auth, email)
       .then(() => {
-        console.log("Success: Password Reset Email sent.");
+        // Hiển thị thông báo khi email reset đã được gửi thành công
+        Alert.alert(
+          "Email Đã Được Gửi",
+          "Mật khẩu đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.",
+          [{ text: "OK", onPress: () => navigation.navigate('Login') }]
+        );
       })
-      .catch((error) => setErrorState(error.message));
+      .catch((error) => {
+        // Hiển thị lỗi nếu quá trình gửi email gặp vấn đề
+        setErrorState(error.message);
+        Alert.alert(
+          "Lỗi",
+          "Không thể gửi email đặt lại mật khẩu. Vui lòng kiểm tra lại email và thử lại.",
+          [{ text: "OK" }]
+        );
+      });
   };
+
   return (
     <View isSafe style={styles.container}>
       <View style={styles.innerContainer}>
-        <Text style={styles.screenTitle}>Reset your password</Text>
+        <Text style={styles.screenTitle}>Reset mật khẩu</Text>
       </View>
       <Formik
         initialValues={{ email: "" }}
@@ -57,7 +70,7 @@ export const ForgotPasswordScreen = ({navigation}) => {
             ) : null}
             {/* Password Reset Send Email button */}
             <Button style={styles.button} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>Send Reset Email</Text>
+              <Text style={styles.buttonText}>Gửi email reset</Text>
             </Button>
           </>
         )}
@@ -66,19 +79,20 @@ export const ForgotPasswordScreen = ({navigation}) => {
       <Button
         style={styles.borderlessButtonContainer}
         borderless
-        title={"Go back to Login"}
+        title={"Trở lại đăng nhập"}
         onPress={() => navigation.navigate('Login')}
       />
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.white,
     paddingHorizontal: 12,
   },
-  innercontainer: {
+  innerContainer: {
     alignItems: "center",
   },
   screenTitle: {
